@@ -1,9 +1,18 @@
 import speech_recognition as sr
 import pyttsx3
 from pyowm import OWM
+import pycountry
+import geonamescache
 import webbrowser
 import random
 
+# try:
+#     userCommand = (r.recognize_google(audio))    
+# except sr.UnknownValueError:
+#     speak("Sorry sir, I could not understand audio")
+# except sr.RequestError as e:
+#     print("Could not request results from Google Speech Recognition service; {0}".format(e))
+# return userCommand
 
 #Text to speech setup
 engine = pyttsx3.init()
@@ -27,13 +36,27 @@ def findURL(userCommand):
             return("http://www."+userCommand.split()[i+1]+".com")
     return "URL not found"
     
-    try:
-        userCommand = (r.recognize_google(audio))    
-    except sr.UnknownValueError:
-        speak("Sorry sir, I could not understand audio")
-    except sr.RequestError as e:
-        print("Could not request results from Google Speech Recognition service; {0}".format(e))
-    return userCommand
+
+def findLocation(userCommand):
+    for country in pycountry.countries :
+        if country.name.lower() in userCommand : 
+            return country.name
+    cities = geonamescache.GeonamesCache().get_cities()
+    for key in cities :
+        if cities[key]['name'].lower() in userCommand.split():
+            return cities[key]['name'].capitalize()
+    return None
+    
+def printAndSpeak(input):
+    print(input)
+    speak(input)
+
+def displayWeather(weatherData):
+    printAndSpeak("Humidity : "+str(weatherData.get_humidity())+"%\n")
+    #convert floating point number to speakable string
+    printAndSpeak("Temperature : "+str(weatherData.get_temperature(unit="celsius")["temp"])+"degree celsius\n")
+    printAndSpeak("Status : "+weatherData.get_detailed_status())
+
 
 userCommand = ""  
 while(True):
@@ -55,8 +78,13 @@ while(True):
         else:
             webbrowser.open(URL,new=2)
     elif("weather" in userCommand.lower()):
-        weatherData = owm.weather_at_id(2643741)
-        print(weatherData.get_weather())
+        location = findLocation(userCommand.lower())
+        if(location==None):
+            speak("Sorry sir, I could not find the location you entered")
+        else:
+            printAndSpeak("Showing the weather report of "+location)
+            weatherData = owm.weather_at_place(location).get_weather()
+            displayWeather(weatherData)
         
         
     
