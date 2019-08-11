@@ -6,14 +6,6 @@ import geonamescache
 import webbrowser
 import random
 
-# try:
-#     userCommand = (r.recognize_google(audio))
-# except sr.UnknownValueError:
-#     speak("Sorry sir, I could not understand audio")
-# except sr.RequestError as e:
-#     print("Could not request results from Google Speech Recognition service; {0}".format(e))
-# return userCommand
-
 #Text to speech setup
 engine = pyttsx3.init()
 
@@ -24,11 +16,27 @@ def speak(text):
     engine.say(text)
     engine.runAndWait()
 
+def printAndSpeak(input):
+    print(input)
+    speak(input)
+
+def convert(temperature):
+    temperature = str(temperature).split('.')[0] + " point " + str(temperature).split('.')[1]
+    return temperature
+
 def handleSpeech(userCommand):
     r = sr.Recognizer()
     with sr.Microphone() as source :
-        audio = r.listen(source)
         print("Listening....")
+        audio = r.listen(source)
+    try:
+        userCommand = (r.recognize_google(audio))
+    except sr.UnknownValueError:
+        userCommand = ""
+        printAndSpeak("Sorry sir, I could not understand audio")
+    except sr.RequestError as e:
+        print("Could not request results from Google Speech Recognition service; {0}".format(e))
+    return userCommand
 
 def findURL(userCommand):
     for i,word in enumerate(userCommand.split()):
@@ -40,6 +48,7 @@ def findURL(userCommand):
 def findLocation(userCommand):
     for country in pycountry.countries :
         if country.name.lower() in userCommand :
+            print(country.name)
             return country.name
     cities = geonamescache.GeonamesCache().get_cities()
     for key in cities :
@@ -47,22 +56,20 @@ def findLocation(userCommand):
             return cities[key]['name'].capitalize()
     return None
 
-def printAndSpeak(input):
-    print(input)
-    speak(input)
 
 def displayWeather(weatherData):
     printAndSpeak("Humidity : "+str(weatherData.get_humidity())+"%\n")
-    #convert floating point number to speakable string
-    printAndSpeak("Temperature : "+str(weatherData.get_temperature(unit="celsius")["temp"])+"degree celsius\n")
+    print("Temperature : "+str(weatherData.get_temperature(unit="celsius")["temp"])+" degree celsius\n")
+    speak("Temperature : "+convert(weatherData.get_temperature(unit="celsius")["temp"])+" degree celsius\n")
     printAndSpeak("Status : "+weatherData.get_detailed_status())
 
 
 userCommand = ""
 while(True):
     printAndSpeak("How may I help you, sir?")
-    # userCommand = handleSpeech(userCommand)
-    userCommand=input("Enter your command : ")
+    userCommand = handleSpeech(userCommand)
+    # userCommand=input("Enter your command : ")
+    print("Your command :", userCommand)
     if("bye" in userCommand.lower()):
         speak("Bye sir, see you next time")
         break
