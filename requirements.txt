@@ -1,5 +1,6 @@
-geonamescache==1.0.2
 pycountry==19.7.15
-pyttsx3==2.71
-SpeechRecognition==3.8.1
 requests==2.22.0
+geonamescache==1.0.2
+pyttsx3==2.71
+Wikipedia_API==0.5.1
+SpeechRecognition==3.8.1

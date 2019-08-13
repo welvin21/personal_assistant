@@ -3,14 +3,15 @@ from recognizer import handleSpeech
 from weather import getLocation,getWeatherData,displayWeather
 from speaker import Speaker
 from browser import Browser
+from wikipedia import isQuestion,Wikipedia
 
 browser1 = Browser()
 speaker1 = Speaker()
 userCommand = ""
 while(True):
     speaker1.printAndSpeak("How may I help you, sir?")
-    userCommand = handleSpeech(userCommand)
-    # userCommand=input("Enter your command : ")
+    # userCommand = handleSpeech(userCommand)
+    userCommand=input("Enter your command : ")
     print("Your command :", userCommand)
     if("bye" in userCommand.lower()):
         speaker1.speak("Bye sir, see you next time")
@@ -23,4 +24,14 @@ while(True):
         browser1.open(userCommand)
     elif("weather" in userCommand.lower()):
         displayWeather(userCommand)
+    elif(isQuestion(userCommand)):
+        wiki = Wikipedia(userCommand)
+        wiki.findKeyword()
+        if(wiki.doesPageExist()):
+            wiki.displaySummary()
+        else:
+            speaker1.printAndSpeak("Sorry sir, couldn't get information ")
+
+
+     
     
