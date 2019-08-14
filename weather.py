@@ -25,7 +25,8 @@ class Weather :
 speaker2 = Speaker()
 
 def convert(temperature):
-    temperature = str(temperature).split('.')[0] + " point " + str(temperature).split('.')[1]
+    if("." in str(temperature)):
+        temperature = str(temperature).split('.')[0] + " point " + str(temperature).split('.')[1]
     return temperature
 
 def getLocation(userCommand):
@@ -39,8 +40,10 @@ def getLocation(userCommand):
     return ""
 def getWeatherData(userCommand):
     location = getLocation(userCommand)
-    url =  f"http://api.openweathermap.org/data/2.5/weather?q={location}&units=metric&APPID=328a3cfff5c381860add146bf8197513"
-    response = requests.get(url)
+    apiKey = "328a3cfff5c381860add146bf8197513"
+    url =  "http://api.openweathermap.org/data/2.5/weather"
+    payload = {'q' : location,'units' : 'metric','APPID' : apiKey}
+    response = requests.get(url,params=payload)
     if(response.status_code!=200):
         return "Sorry sir, location not found"
     return response.json()
