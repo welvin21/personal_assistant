@@ -1,5 +1,5 @@
 pycountry==19.7.15
-requests==2.22.0
+requests==2.31.0
 geonamescache==1.0.2
 pyttsx3==2.71
 Wikipedia_API==0.5.1
